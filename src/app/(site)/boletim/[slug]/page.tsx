@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 import { BulletinView } from "@/components/bulletin/bulletin-view";
 import { ShareActions } from "@/components/site/share-actions";
 import { WhatsAppIcon } from "@/components/site/social-icons";
@@ -52,6 +53,12 @@ export default async function BulletinPage({ params }: PageProps<"/boletim/[slug
         <span aria-hidden="true">/</span>
         <span className="text-ink-2">{formatDateCompact(bulletin.referenceDate)}</span>
       </nav>
+
+      {/* Marca e link só no PDF/impressão (o cabeçalho do site não é impresso) */}
+      <div className="mb-4 hidden items-center justify-between print:flex">
+        <Logo />
+        <span className="text-xs text-muted">{url}</span>
+      </div>
 
       <BulletinView
         content={bulletin.content}
