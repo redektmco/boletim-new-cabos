@@ -106,23 +106,27 @@ anteriores **fictícias** só para os gráficos terem histórico. Para carregar 
 
 ## Publicando (Vercel + Turso)
 
-1. **Importe o repositório na [Vercel](https://vercel.com/new)** (framework detectado automaticamente).
-2. **Banco:** em *Storage → Marketplace*, adicione **Turso Cloud** e conecte ao projeto **sem prefixo** nas
-   variáveis (ficam `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN`, que o app já reconhece). Se usar um prefixo, crie
-   manualmente `DATABASE_URL` e `DATABASE_AUTH_TOKEN` com os valores.
-3. **Imagens de capa:** em *Storage*, crie um **Blob store** e conecte ao projeto (cria `BLOB_READ_WRITE_TOKEN`).
+O `vercel.json` já força o preset Next.js. O build (`npm run build`) aplica as migrações antes de compilar.
+
+1. **Importe o repositório na [Vercel](https://vercel.com/new)** e defina *Settings → Git → Production Branch* = `master`.
+2. **Banco (Turso):** em *Storage → Create Database → Turso Cloud*, crie o banco (região `us-east-1`, a mesma das
+   funções da Vercel) e conecte ao projeto **sem prefixo** — ficam `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN`, que o
+   app já reconhece. Com prefixo, crie manualmente `DATABASE_URL` e `DATABASE_AUTH_TOKEN` com os valores.
+3. **Imagens de capa:** um *Blob store* conectado ao projeto (cria `BLOB_READ_WRITE_TOKEN`).
 4. **Variáveis de ambiente** (*Settings → Environment Variables*):
    - `SESSION_SECRET` — gere com `openssl rand -base64 32`
-   - `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` — primeiro administrador (criado no primeiro build)
-   - `NEXT_PUBLIC_SITE_URL` — ex.: `https://boletim.newcabos.com.br`
-   - `NEXT_PUBLIC_WHATSAPP` — WhatsApp comercial com DDI, só dígitos (padrão `5515996099494`)
-5. **Deploy.** O build aplica as migrações e cria o admin. Depois, troque a senha em `/admin/conta` e, se quiser,
-   remova `ADMIN_PASSWORD` das variáveis.
-6. **Domínio (opcional):** em *Settings → Domains*, adicione `boletim.newcabos.com.br` e crie o registro CNAME
-   indicado no DNS da New Cabos. Um link "Boletim do Cobre" no site institucional (Wix) completa a integração.
+   - `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` — primeiro administrador
+   - `NEXT_PUBLIC_SITE_URL` — opcional; sem ela, usa o domínio de produção da Vercel
+   - `NEXT_PUBLIC_WHATSAPP` — opcional; WhatsApp comercial com DDI, só dígitos (padrão `5515996099494`)
+5. **Deploy.** No primeiro build com o banco vazio, o sistema cria o administrador e já publica a edição de
+   18/09/2026. Depois, troque a senha em `/admin/conta` (a variável `ADMIN_PASSWORD` só é usada nesse primeiro build).
+6. **Domínio (opcional):** em *Settings → Domains*, adicione `boletim.newcabos.com.br` e crie o CNAME indicado no DNS
+   da New Cabos. Por padrão, a Vercel exige login nos endereços `*.vercel.app` do projeto (*Deployment Protection*);
+   com domínio próprio o site fica público, ou desative a proteção para liberar o `*.vercel.app`.
 
-Para carregar a edição de 18/09 no banco de produção, rode localmente com as credenciais do Turso:
-`DATABASE_URL=libsql://... DATABASE_AUTH_TOKEN=... npm run db:seed -- --only-real`.
+**Modo demonstração:** se o projeto for publicado na Vercel sem banco configurado, o build não falha — ele cria um
+banco temporário com a edição real e o histórico fictício, que vai junto no deploy em modo somente leitura. O site
+mostra uma faixa "Versão de demonstração" e o painel não salva. Basta conectar o Turso e fazer o redeploy.
 
 ## Personalização rápida
 

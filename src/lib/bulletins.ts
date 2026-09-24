@@ -2,6 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { DEMO_MODE_MESSAGE, isDemoMode } from "@/lib/db/config";
 import { bulletins, type BulletinRow } from "@/lib/db/schema";
 import { bulletinContentSchema, type BulletinContent, type BulletinStatus } from "@/lib/bulletin/schema";
 import type { HistoryPoint } from "@/lib/bulletin/types";
@@ -96,7 +97,12 @@ async function uniqueSlug(referenceDate: string, excludeId?: number) {
   throw new Error("Não foi possível gerar um endereço único para esta edição.");
 }
 
+function assertWritable() {
+  if (isDemoMode()) throw new Error(DEMO_MODE_MESSAGE);
+}
+
 export async function createBulletin(input: unknown, status: BulletinStatus, userId: number) {
+  assertWritable();
   const content = bulletinContentSchema.parse(input);
   const slug = await uniqueSlug(content.referenceDate);
   const [row] = await db
@@ -117,6 +123,7 @@ export async function createBulletin(input: unknown, status: BulletinStatus, use
 }
 
 export async function updateBulletin(id: number, input: unknown, status: BulletinStatus, userId: number) {
+  assertWritable();
   const content = bulletinContentSchema.parse(input);
   const current = await getBulletinById(id);
   if (!current) throw new Error("Edição não encontrada.");
@@ -154,6 +161,7 @@ export async function setBulletinStatus(id: number, status: BulletinStatus, user
 }
 
 export async function deleteBulletin(id: number) {
+  assertWritable();
   const [row] = await db.delete(bulletins).where(eq(bulletins.id, id)).returning({ slug: bulletins.slug });
   if (row) revalidateBulletinPages();
 }
