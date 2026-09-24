@@ -6,15 +6,16 @@ import { Logo } from "@/components/brand/logo";
 import { BulletinView } from "@/components/bulletin/bulletin-view";
 import { ShareActions } from "@/components/site/share-actions";
 import { WhatsAppIcon } from "@/components/site/social-icons";
-import { getPublishedBySlug } from "@/lib/bulletins";
+import { getPublishedBySlug, listPublished } from "@/lib/bulletins";
 import { formatCopper, formatDateCompact, formatDateShort } from "@/lib/bulletin/format";
 import { BIAS_LABEL } from "@/lib/bulletin/labels";
 import { absoluteUrl, whatsappLink } from "@/lib/site";
 
 export const revalidate = 300;
 
+// Edições existentes são geradas no build; as novas, no primeiro acesso (e revalidadas ao salvar).
 export async function generateStaticParams() {
-  return [];
+  return (await listPublished()).map((b) => ({ slug: b.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/boletim/[slug]">): Promise<Metadata> {
