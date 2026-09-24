@@ -12,6 +12,17 @@ desenvolvedor.
 | `/boletins` | Todas as edições, filtráveis por viés (alta, lateral, baixa) e ano |
 | `/admin` | Painel da equipe: criar, editar com pré-visualização ao vivo, publicar, gerenciar usuários |
 
+### Painel da equipe
+
+| Lista de edições | Editor com pré-visualização ao vivo |
+| --- | --- |
+| ![Lista de edições](docs/screenshots/admin-list-desktop.png) | ![Editor](docs/screenshots/admin-editor-desktop.png) |
+
+No editor, cada seção do boletim é um bloco do formulário; as variações são calculadas enquanto se digita
+(com alerta para mudanças acima de 15%, provável erro de digitação), a pré-visualização alterna entre
+computador e celular, `Ctrl/Cmd + S` salva e há confirmação antes de publicar, despublicar ou excluir.
+Administradores gerenciam usuários em `/admin/usuarios`; cada pessoa troca a própria senha em `/admin/conta`.
+
 ## Por que um editor estruturado (e não um blog comum)
 
 O boletim tem **sempre a mesma estrutura** (cotações, variações, notícias, fatores de alta/baixa, termômetro,

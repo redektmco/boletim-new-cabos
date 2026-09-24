@@ -98,7 +98,9 @@ export const bulletinContentSchema = z.object({
   /** Manchete curta — aparece nos cards da página inicial e no compartilhamento. */
   headline: requiredText(140, "Escreva uma manchete para a edição"),
   intro: text(280).default(""),
-  coverImageUrl: text(500).default(""),
+  coverImageUrl: text(500)
+    .refine((v) => v === "" || /^(https?:\/\/\S+|\/[^/\s]\S*)$/i.test(v), "Use um endereço https:// ou envie uma imagem")
+    .default(""),
 
   copper: quoteSchema,
   dollar: quoteSchema,

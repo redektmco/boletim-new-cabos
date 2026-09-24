@@ -15,6 +15,10 @@ const env = {
   NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`,
 };
 
+// e2e/admin.spec.ts entra no painel com o admin que o servidor de teste cria
+process.env.E2E_ADMIN_EMAIL ??= env.ADMIN_EMAIL;
+process.env.E2E_ADMIN_PASSWORD ??= env.ADMIN_PASSWORD;
+
 export default defineConfig({
   testDir: "e2e",
   workers: 1,

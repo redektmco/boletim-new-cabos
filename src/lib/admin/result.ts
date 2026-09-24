@@ -1,3 +1,5 @@
+import { DEMO_MODE_MESSAGE } from "@/lib/db/config";
+
 /** Retorno padrão das Server Actions do painel: nunca lançam erro para o navegador. */
 export type ActionResult<T extends object = object> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -13,6 +15,7 @@ export const READ_ONLY_DB_ERROR =
  */
 export function userFacingError(error: unknown, fallback = GENERIC_ERROR): string {
   if (!(error instanceof Error) || !error.message) return fallback;
+  if (error.message === DEMO_MODE_MESSAGE) return DEMO_MODE_MESSAGE;
   const text = `${error.name} ${error.message}`;
   if (/SQLITE_READONLY|readonly database|read-only/i.test(text)) return READ_ONLY_DB_ERROR;
   const technical =

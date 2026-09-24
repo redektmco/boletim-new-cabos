@@ -4,16 +4,11 @@ import { DemoModeBanner } from "@/components/admin/demo-mode-banner";
 import { PanelHeader } from "@/components/admin/panel-header";
 import { ConfirmProvider } from "@/components/admin/ui/confirm";
 import { requireUser } from "@/lib/auth/session";
+import { isDemoMode } from "@/lib/db/config";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
-
-// TODO(merge): substituir por `isDemoMode()` de "@/lib/db/config" (existe na branch principal).
-// O editor ocupa exatamente a altura da tela em telas grandes; com a faixa visível, a página rola um pouco.
-function isDemoMode() {
-  return false;
-}
 
 export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
   const user = await requireUser();
