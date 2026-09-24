@@ -56,6 +56,7 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
   const [active, setActive] = useState<number | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
+  const pointerType = useRef<string>("mouse");
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -259,10 +260,17 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
                 height={innerH}
                 fill="transparent"
                 className="cursor-pointer"
-                onPointerMove={(e) => setActive(indexFromPointer(e))}
-                onPointerLeave={() => setActive(null)}
+                onPointerDown={(e) => (pointerType.current = e.pointerType)}
+                onPointerMove={(e) => e.pointerType === "mouse" && setActive(indexFromPointer(e))}
+                onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
                 onClick={(e) => {
-                  const p = data[indexFromPointer(e)];
+                  const index = indexFromPointer(e);
+                  // no toque, o primeiro toque mostra o valor; tocar de novo no mesmo ponto abre a edição
+                  if (pointerType.current !== "mouse" && index !== active) {
+                    setActive(index);
+                    return;
+                  }
+                  const p = data[index];
                   if (p) router.push(`/boletim/${p.slug}`);
                 }}
               />
@@ -332,7 +340,7 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
       )}
       <p className="mt-3 text-xs text-muted">
         {view === "chart"
-          ? "Passe o mouse (ou use as setas do teclado) para ver cada edição; clique para abrir o boletim."
+          ? "Passe o mouse ou toque no gráfico para ver cada edição (setas do teclado também funcionam); clique ou toque de novo para abrir o boletim."
           : "Variação em relação à edição anterior ao lado de cada valor."}
       </p>
     </div>

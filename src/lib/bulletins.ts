@@ -112,7 +112,7 @@ export async function createBulletin(input: unknown, status: BulletinStatus, use
       updatedBy: userId,
     })
     .returning();
-  revalidateBulletinPages(row.slug);
+  revalidateBulletinPages();
   return row;
 }
 
@@ -143,8 +143,7 @@ export async function updateBulletin(id: number, input: unknown, status: Bulleti
     .where(eq(bulletins.id, id))
     .returning();
 
-  revalidateBulletinPages(row.slug);
-  if (slug !== current.slug) revalidateBulletinPages(current.slug);
+  revalidateBulletinPages();
   return row;
 }
 
@@ -156,16 +155,14 @@ export async function setBulletinStatus(id: number, status: BulletinStatus, user
 
 export async function deleteBulletin(id: number) {
   const [row] = await db.delete(bulletins).where(eq(bulletins.id, id)).returning({ slug: bulletins.slug });
-  if (row) revalidateBulletinPages(row.slug);
+  if (row) revalidateBulletinPages();
 }
 
-/** Atualiza as páginas públicas afetadas por uma alteração. */
-export function revalidateBulletinPages(slug?: string) {
-  revalidatePath("/");
-  revalidatePath("/boletins");
-  if (slug) {
-    revalidatePath(`/boletim/${slug}`);
-  }
-  // números de edição e navegação anterior/próxima mudam em todas as páginas
-  revalidatePath("/boletim/[slug]", "page");
+/**
+ * Atualiza as páginas públicas após uma alteração. Uma edição mexe na home, no arquivo, na navegação e no
+ * número de todas as outras edições, no sitemap e nas imagens de compartilhamento — então revalida tudo
+ * (são poucas páginas, e só acontece quando alguém salva no painel).
+ */
+export function revalidateBulletinPages() {
+  revalidatePath("/", "layout");
 }
